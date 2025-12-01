@@ -1,0 +1,11 @@
+/home/niko/Projects/Education/Backend/LabProject/Models/bin/Debug/net9.0/Models.deps.json
+/home/niko/Projects/Education/Backend/LabProject/Models/bin/Debug/net9.0/Models.dll
+/home/niko/Projects/Education/Backend/LabProject/Models/bin/Debug/net9.0/Models.pdb
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/Models.GeneratedMSBuildEditorConfig.editorconfig
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/Models.AssemblyInfoInputs.cache
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/Models.AssemblyInfo.cs
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/Models.csproj.CoreCompileInputs.cache
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/Models.dll
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/refint/Models.dll
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/Models.pdb
+/home/niko/Projects/Education/Backend/LabProject/Models/obj/Debug/net9.0/ref/Models.dll
