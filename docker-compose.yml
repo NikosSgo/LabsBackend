@@ -7,6 +7,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_HOST_AUTH_METHOD=md5
       - POSTGRES_INITDB_ARGS=--auth=md5
+    ports:
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql
       - ./initdb.d:/docker-entrypoint-initdb.d
@@ -24,20 +26,48 @@ services:
     depends_on:
       - postgres
 
-  webapi:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=mypassword
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+
+  oms:
     build:
       context: .
-      dockerfile: WebApi/Dockerfile
+      dockerfile: Oms/Dockerfile
     ports:
       - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=pgbouncer;Port=5432;Database=postgres;Username=user;Password=mypassword;Pooling=true;
+      - ASPNETCORE_ENVIRONMENT=Docker
     depends_on:
       - pgbouncer
+      - rabbitmq
     volumes:
-      - ./WebApi/appsettings.Development.json:/app/appsettings.Development.json:ro
-      - ./WebApi/appsettings.json:/app/appsettings.json:ro
+      - ./Oms/appsettings.Docker.json:/app/appsettings.Docker.json:ro
+      - ./Oms/appsettings.json:/app/appsettings.json:ro
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Consumer/Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      - pgbouncer
+      - rabbitmq
+    volumes:
+      - ./Consumer/appsettings.Docker.json:/app/appsettings.Docker.json:ro
+      - ./Consumer/appsettings.json:/app/appsettings.json:ro
 
 volumes:
   pgdata:
+  rabbitmqdata:
