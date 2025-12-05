@@ -1,11 +1,10 @@
 using Messages;
 using Microsoft.Extensions.Options;
-using WebApi;
 using WebApi.BLL.Models;
+using WebApi.Config;
 using WebApi.DAL;
 using WebApi.DAL.Interfaces;
 using WebApi.DAL.Models;
-using WebApi.Config;
 
 namespace WebApi.BLL.Services;
 
@@ -41,12 +40,52 @@ public class OrderService(
 
             insertedOrders = await orderRepository.BulkInsert(orderDals, token);
 
-            var allOrderItems = orderUnits.SelectMany((order, index) =>
+            // Создаем словарь для сопоставления вставленных заказов с исходными по их свойствам
+            // Используем свойства без CreatedAt, так как время может немного отличаться
+            // Используем список для каждого ключа, чтобы обработать возможные дубликаты
+            var orderMapping = new Dictionary<(long CustomerId, string DeliveryAddress, long TotalPriceCents, string TotalPriceCurrency), List<V1OrderDal>>();
+            foreach (var insertedOrder in insertedOrders)
             {
-                var orderId = insertedOrders[index].Id;
+                var key = (insertedOrder.CustomerId, insertedOrder.DeliveryAddress, 
+                          insertedOrder.TotalPriceCents, insertedOrder.TotalPriceCurrency);
+                if (!orderMapping.TryGetValue(key, out var orders))
+                {
+                    orders = new List<V1OrderDal>();
+                    orderMapping[key] = orders;
+                }
+                orders.Add(insertedOrder);
+            }
+
+            // Отслеживаем, какие заказы уже использованы для обработки дубликатов
+            var usedOrders = new Dictionary<(long CustomerId, string DeliveryAddress, long TotalPriceCents, string TotalPriceCurrency), int>();
+            
+            var allOrderItems = orderUnits.SelectMany(order =>
+            {
+                // Находим соответствующий вставленный заказ по свойствам (без CreatedAt)
+                var key = (order.CustomerId, order.DeliveryAddress, 
+                          order.TotalPriceCents, order.TotalPriceCurrency);
+                if (!orderMapping.TryGetValue(key, out var matchingOrders) || matchingOrders.Count == 0)
+                {
+                    throw new InvalidOperationException($"Не удалось найти вставленный заказ для сопоставления OrderItems");
+                }
+                
+                // Используем индекс для выбора нужного заказа в случае дубликатов
+                if (!usedOrders.TryGetValue(key, out var usedIndex))
+                {
+                    usedIndex = 0;
+                }
+                
+                if (usedIndex >= matchingOrders.Count)
+                {
+                    throw new InvalidOperationException($"Недостаточно вставленных заказов для сопоставления (дубликаты)");
+                }
+                
+                var insertedOrder = matchingOrders[usedIndex];
+                usedOrders[key] = usedIndex + 1;
+                
                 return order.OrderItems?.Select(item => new V1OrderItemDal
                 {
-                    OrderId = orderId,
+                    OrderId = insertedOrder.Id,
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
                     ProductTitle = item.ProductTitle,
@@ -101,7 +140,9 @@ public class OrderService(
             await _rabbitMqService.Publish(messages, settings.Value.OrderCreatedQueue, token);
         }
 
-        return Map(insertedOrders);
+        // Создаем lookup для OrderItems чтобы включить их в ответ
+        var orderItemLookupForResponse = insertedItems.ToLookup(x => x.OrderId);
+        return Map(insertedOrders, orderItemLookupForResponse);
     }
     
     /// <summary>

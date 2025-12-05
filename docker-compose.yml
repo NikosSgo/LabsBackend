@@ -37,6 +37,12 @@ services:
       - RABBITMQ_DEFAULT_PASS=mypassword
     volumes:
       - rabbitmqdata:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   oms:
     build:
@@ -62,8 +68,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
     depends_on:
-      - pgbouncer
-      - rabbitmq
+      pgbouncer:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
     volumes:
       - ./Consumer/appsettings.Docker.json:/app/appsettings.Docker.json:ro
       - ./Consumer/appsettings.json:/app/appsettings.json:ro
