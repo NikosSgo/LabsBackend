@@ -88,3 +88,4 @@
 /home/niko/Projects/Education/Backend/LabProject/Migrations/obj/Debug/net9.0/Migrations.pdb
 /home/niko/Projects/Education/Backend/LabProject/Migrations/obj/Debug/net9.0/Migrations.genruntimeconfig.cache
 /home/niko/Projects/Education/Backend/LabProject/Migrations/obj/Debug/net9.0/ref/Migrations.dll
+/home/niko/Projects/Education/Backend/LabProject/Migrations/obj/Debug/net9.0/Migrations.sourcelink.json
