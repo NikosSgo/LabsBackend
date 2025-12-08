@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj": {}
+    "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj": {}
   },
   "projects": {
-    "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj",
         "projectName": "Common",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Common/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -75,14 +75,14 @@
         }
       }
     },
-    "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj",
         "projectName": "Messages",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -140,14 +140,14 @@
         }
       }
     },
-    "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj",
         "projectName": "Migrations",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Migrations/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -239,14 +239,14 @@
         }
       }
     },
-    "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj",
         "projectName": "Models",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Models/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -304,14 +304,14 @@
         }
       }
     },
-    "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
         "projectName": "Oms",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Oms/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -326,17 +326,17 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj": {
-                "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj"
+              "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj": {
+                "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj"
               },
-              "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj": {
-                "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj"
+              "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj": {
+                "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj"
               },
-              "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj": {
-                "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj"
+              "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj": {
+                "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj"
               },
-              "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj": {
-                "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj"
+              "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj": {
+                "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj"
               }
             }
           }
@@ -357,6 +357,10 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "AutoFixture": {
+              "target": "Package",
+              "version": "[5.0.0-preview0012, )"
+            },
             "Dapper": {
               "target": "Package",
               "version": "[2.1.6, )"

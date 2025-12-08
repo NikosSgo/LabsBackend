@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj",
+      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj",
       "projectName": "Models",
-      "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj",
+      "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj",
       "packagesPath": "/home/niko/.nuget/packages/",
-      "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Models/obj/",
+      "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/niko/.nuget/NuGet/NuGet.Config"

@@ -1,20 +1,27 @@
 services:
   postgres:
     image: postgres
+    container_name: postgres
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=mypassword
       - POSTGRES_DB=postgres
       - POSTGRES_HOST_AUTH_METHOD=md5
       - POSTGRES_INITDB_ARGS=--auth=md5
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql
-      - ./initdb.d:/docker-entrypoint-initdb.d
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   pgbouncer:
     image: edoburu/pgbouncer:latest
+    container_name: pgbouncer
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -23,8 +30,12 @@ services:
       - ADMIN_USERS=postgres,admin
     ports:
       - "15432:5432"
+    volumes:
+      - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -52,6 +63,12 @@ services:
       - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/swagger/index.html || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     depends_on:
       - pgbouncer
       - rabbitmq
@@ -63,19 +80,17 @@ services:
     build:
       context: .
       dockerfile: Consumer/Dockerfile
-    ports:
-      - "8090:8090"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Docker
+      ASPNETCORE_URLS: http://+:8090
+      ASPNETCORE_ENVIRONMENT: Docker
+    restart: unless-stopped
+    deploy:
+      replicas: 5
     depends_on:
-      pgbouncer:
-        condition: service_started
-      rabbitmq:
+      oms:
         condition: service_healthy
-    restart: on-failure
-    volumes:
-      - ./Consumer/appsettings.Docker.json:/app/appsettings.Docker.json:ro
-      - ./Consumer/appsettings.json:/app/appsettings.json:ro
+      rabbitmq:
+        condition: service_started
 
 volumes:
   pgdata:

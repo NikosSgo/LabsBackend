@@ -2,6 +2,23 @@
   "version": 3,
   "targets": {
     "net9.0": {
+      "AutoFixture/5.0.0-preview0012": {
+        "type": "package",
+        "dependencies": {
+          "Fare": "[2.2.1, 3.0.0)",
+          "System.ComponentModel.Annotations": "4.4.0"
+        },
+        "compile": {
+          "lib/net6.0/AutoFixture.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/AutoFixture.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Azure.Core/1.38.0": {
         "type": "package",
         "dependencies": {
@@ -56,6 +73,19 @@
         },
         "runtime": {
           "lib/net5.0/Dapper.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Fare/2.2.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Fare.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Fare.dll": {
             "related": ".xml"
           }
         }
@@ -1519,6 +1549,30 @@
     }
   },
   "libraries": {
+    "AutoFixture/5.0.0-preview0012": {
+      "sha512": "VVvNRW2rpZOXMg7+YfIBObhC26ScD/vIcV0MVd8u32dSndzlGjcsX1clus+MDpCbkHf4fJ5aULWJ6y7ueu7Ijg==",
+      "type": "package",
+      "path": "autofixture/5.0.0-preview0012",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "autofixture.5.0.0-preview0012.nupkg.sha512",
+        "autofixture.nuspec",
+        "icon.png",
+        "lib/net462/AutoFixture.dll",
+        "lib/net462/AutoFixture.pdb",
+        "lib/net462/AutoFixture.xml",
+        "lib/net5.0/AutoFixture.dll",
+        "lib/net5.0/AutoFixture.pdb",
+        "lib/net5.0/AutoFixture.xml",
+        "lib/net6.0/AutoFixture.dll",
+        "lib/net6.0/AutoFixture.pdb",
+        "lib/net6.0/AutoFixture.xml",
+        "lib/netstandard2.0/AutoFixture.dll",
+        "lib/netstandard2.0/AutoFixture.pdb",
+        "lib/netstandard2.0/AutoFixture.xml"
+      ]
+    },
     "Azure.Core/1.38.0": {
       "sha512": "IuEgCoVA0ef7E4pQtpC3+TkPbzaoQfa77HlfJDmfuaJUCVJmn7fT0izamZiryW5sYUFKizsftIxMkXKbgIcPMQ==",
       "type": "package",
@@ -1574,6 +1628,23 @@
         "lib/netstandard2.0/Dapper.dll",
         "lib/netstandard2.0/Dapper.xml",
         "readme.md"
+      ]
+    },
+    "Fare/2.2.1": {
+      "sha512": "21XZo/yuXK1k0EUhdLnjgRD4n0HQYmPFchV6uaORcRc65rasZ1vdm2dmJXPBKZiIBztRRYRmmg/B76W721VWkA==",
+      "type": "package",
+      "path": "fare/2.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "fare.2.2.1.nupkg.sha512",
+        "fare.nuspec",
+        "lib/net35/Fare.dll",
+        "lib/net35/Fare.xml",
+        "lib/netstandard1.1/Fare.dll",
+        "lib/netstandard1.1/Fare.xml",
+        "lib/netstandard2.0/Fare.dll",
+        "lib/netstandard2.0/Fare.xml"
       ]
     },
     "FirebirdSql.Data.FirebirdClient/10.3.1": {
@@ -4139,6 +4210,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "AutoFixture >= 5.0.0-preview0012",
       "Common >= 1.0.0",
       "Dapper >= 2.1.6",
       "FluentValidation >= 11.11.0",
@@ -4157,11 +4229,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
       "projectName": "Oms",
-      "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+      "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
       "packagesPath": "/home/niko/.nuget/packages/",
-      "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Oms/obj/",
+      "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -4176,17 +4248,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj"
             },
-            "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj"
             },
-            "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj"
             },
-            "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj"
             }
           }
         }
@@ -4207,6 +4279,10 @@
       "net9.0": {
         "targetAlias": "net9.0",
         "dependencies": {
+          "AutoFixture": {
+            "target": "Package",
+            "version": "[5.0.0-preview0012, )"
+          },
           "Dapper": {
             "target": "Package",
             "version": "[2.1.6, )"

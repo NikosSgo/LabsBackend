@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wk/ToVDnJ/I=",
+  "dgSpecHash": "tmrv7HoRc0o=",
   "success": true,
-  "projectFilePath": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj",
+  "projectFilePath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj",
   "expectedPackageFiles": [
     "/home/niko/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.9/microsoft.aspnetcore.app.ref.9.0.9.nupkg.sha512"
   ],

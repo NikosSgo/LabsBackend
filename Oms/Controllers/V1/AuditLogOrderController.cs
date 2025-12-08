@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Models.Dto.V1.Requests;
 using Models.Dto.V1.Responses;
 using WebApi.BLL.Models;
@@ -9,7 +10,10 @@ namespace WebApi.Controllers.V1;
 
 [ApiController]
 [Route("api/v1/audit/")]
-public class AuditLogOrderController(AuditLogOrderService auditLogOrderService, ValidatorFactory validatorFactory) : ControllerBase
+public class AuditLogOrderController(
+    AuditLogOrderService auditLogOrderService,
+    ValidatorFactory validatorFactory,
+    ILogger<AuditLogOrderController> logger) : ControllerBase
 {
     [HttpPost("log-order")]
     public async Task<ActionResult<V1AuditLogOrderResponse>> V1AuditLogOrder(
@@ -32,13 +36,14 @@ public class AuditLogOrderController(AuditLogOrderService auditLogOrderService, 
                 Orders = Map(res)
             });
         }
-        catch (ArgumentException)
+        catch (ArgumentException ex)
         {
+            logger.LogWarning(ex, "Invalid request data for audit log");
             return BadRequest("Invalid request data");  // 400
         }
         catch (Exception ex)
         {
-            // Логирование
+            logger.LogError(ex, "Failed to process audit log order request");
             return StatusCode(500, "Internal server error");  // 500
         }
     }

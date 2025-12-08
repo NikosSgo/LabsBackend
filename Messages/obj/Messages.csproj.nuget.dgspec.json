@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj": {}
+    "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj": {}
   },
   "projects": {
-    "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj",
         "projectName": "Messages",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"

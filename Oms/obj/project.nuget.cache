@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "/ig1oBsNNPc=",
+  "dgSpecHash": "+rjJwBPSBIU=",
   "success": true,
-  "projectFilePath": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+  "projectFilePath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
   "expectedPackageFiles": [
+    "/home/niko/.nuget/packages/autofixture/5.0.0-preview0012/autofixture.5.0.0-preview0012.nupkg.sha512",
     "/home/niko/.nuget/packages/azure.core/1.38.0/azure.core.1.38.0.nupkg.sha512",
     "/home/niko/.nuget/packages/azure.identity/1.11.4/azure.identity.1.11.4.nupkg.sha512",
     "/home/niko/.nuget/packages/dapper/2.1.11/dapper.2.1.11.nupkg.sha512",
+    "/home/niko/.nuget/packages/fare/2.2.1/fare.2.2.1.nupkg.sha512",
     "/home/niko/.nuget/packages/firebirdsql.data.firebirdclient/10.3.1/firebirdsql.data.firebirdclient.10.3.1.nupkg.sha512",
     "/home/niko/.nuget/packages/fluentmigrator/6.2.0/fluentmigrator.6.2.0.nupkg.sha512",
     "/home/niko/.nuget/packages/fluentmigrator.abstractions/6.2.0/fluentmigrator.abstractions.6.2.0.nupkg.sha512",
@@ -96,9 +98,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "Oms depends on Dapper (>= 2.1.6) but Dapper 2.1.6 was not found. Dapper 2.1.11 was resolved instead.",
-      "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+      "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
       "warningLevel": 1,
-      "filePath": "/home/niko/Projects/Education/Backend/LabProject/Oms/Oms.csproj",
+      "filePath": "/home/niko/Projects/Education/Backend/LabsBackend/Oms/Oms.csproj",
       "libraryId": "Dapper",
       "targetGraphs": [
         "net9.0"

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj": {}
+    "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj": {}
   },
   "projects": {
-    "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj": {
+    "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj",
+        "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj",
         "projectName": "Common",
-        "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj",
+        "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj",
         "packagesPath": "/home/niko/.nuget/packages/",
-        "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Common/obj/",
+        "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/niko/.nuget/NuGet/NuGet.Config"

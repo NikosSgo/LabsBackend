@@ -9,6 +9,7 @@ namespace WebApi.DAL;
 public class UnitOfWork(IOptions<DbSettings> dbSettings): IDisposable
 {
     private NpgsqlConnection _connection;
+    private static NpgsqlDataSource _dataSource;
     
     public async Task<NpgsqlConnection> GetConnection(CancellationToken token)
     {
@@ -17,13 +18,9 @@ public class UnitOfWork(IOptions<DbSettings> dbSettings): IDisposable
             return _connection;
         }
         
-        var dataSource = new NpgsqlDataSourceBuilder(dbSettings.Value.ConnectionString);
-        
-        dataSource.MapComposite<V1OrderDal>("v1_order");
-        dataSource.MapComposite<V1OrderItemDal>("v1_order_item");
-        dataSource.MapComposite<V1AuditLogOrderDal>("v1_audit_log_order");
+        _dataSource ??= CreateDataSource(dbSettings.Value);
        
-        _connection = dataSource.Build().CreateConnection();
+        _connection = _dataSource.CreateConnection();
         _connection.StateChange += (sender, args) =>
         {
             if (args.CurrentState == ConnectionState.Closed)
@@ -56,5 +53,14 @@ public class UnitOfWork(IOptions<DbSettings> dbSettings): IDisposable
     {
         _connection?.Dispose();
         _connection = null;
+    }
+
+    private static NpgsqlDataSource CreateDataSource(DbSettings settings)
+    {
+        var builder = new NpgsqlDataSourceBuilder(settings.ConnectionString);
+        builder.MapComposite<V1OrderDal>("v1_order");
+        builder.MapComposite<V1OrderItemDal>("v1_order_item");
+        builder.MapComposite<V1AuditLogOrderDal>("v1_audit_log_order");
+        return builder.Build();
     }
 }

@@ -299,11 +299,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Consumer/Consumer.csproj",
+      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Consumer/Consumer.csproj",
       "projectName": "Consumer",
-      "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Consumer/Consumer.csproj",
+      "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Consumer/Consumer.csproj",
       "packagesPath": "/home/niko/.nuget/packages/",
-      "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Consumer/obj/",
+      "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Consumer/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/niko/.nuget/NuGet/NuGet.Config"
@@ -318,14 +318,14 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Common/Common.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Common/Common.csproj"
             },
-            "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Messages/Messages.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Messages/Messages.csproj"
             },
-            "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj": {
-              "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Models/Models.csproj"
+            "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj": {
+              "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Models/Models.csproj"
             }
           }
         }

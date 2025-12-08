@@ -3315,11 +3315,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj",
+      "projectUniqueName": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj",
       "projectName": "Migrations",
-      "projectPath": "/home/niko/Projects/Education/Backend/LabProject/Migrations/Migrations.csproj",
+      "projectPath": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/Migrations.csproj",
       "packagesPath": "/home/niko/.nuget/packages/",
-      "outputPath": "/home/niko/Projects/Education/Backend/LabProject/Migrations/obj/",
+      "outputPath": "/home/niko/Projects/Education/Backend/LabsBackend/Migrations/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/niko/.nuget/NuGet/NuGet.Config"

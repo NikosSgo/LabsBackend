@@ -1,4 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+ARG APP_UID=0
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -8,6 +9,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Consumer/Consumer.csproj", "Consumer/"]
+COPY ["Common/Common.csproj", "Common/"]
+COPY ["Messages/Messages.csproj", "Messages/"]
+COPY ["Models/Models.csproj", "Models/"]
 RUN dotnet restore "Consumer/Consumer.csproj"
 COPY . .
 WORKDIR "/src/Consumer"

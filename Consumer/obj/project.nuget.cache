@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "gvudmJdUYKY=",
+  "dgSpecHash": "2piRYOENQ+s=",
   "success": true,
-  "projectFilePath": "/home/niko/Projects/Education/Backend/LabProject/Consumer/Consumer.csproj",
+  "projectFilePath": "/home/niko/Projects/Education/Backend/LabsBackend/Consumer/Consumer.csproj",
   "expectedPackageFiles": [
     "/home/niko/.nuget/packages/microsoft.aspnetcore.openapi/9.0.9/microsoft.aspnetcore.openapi.9.0.9.nupkg.sha512",
     "/home/niko/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
