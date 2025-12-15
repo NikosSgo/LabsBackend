@@ -3,14 +3,13 @@
 using System.Text.Json;
 using Dapper;
 using FluentValidation;
-using WebApi;
-using WebApi.BLL.Services;
-using WebApi.Config;
-using WebApi.DAL;
-using WebApi.DAL.Interfaces;
-using WebApi.DAL.Repositories;
-using WebApi.Jobs;
-using WebApi.Validators;
+using Oms.BLL.Services;
+using Oms.Config;
+using Oms.DAL;
+using Oms.DAL.Interfaces;
+using Oms.DAL.Repositories;
+using Oms.Jobs;
+using Oms.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +26,7 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(Program));
 builder.Services.AddScoped<ValidatorFactory>();
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection(nameof(RabbitMqSettings)));
 builder.Services.AddSingleton<RabbitMqService>();
+builder.Services.AddAutoMapper(typeof(Program));
 // зависимость, которая автоматически подхватывает все контроллеры в проекте
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -34,7 +34,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 // добавляем swagger
 builder.Services.AddSwaggerGen();
-builder.Services.AddHostedService<OrderGenerator>();
 
 // собираем билдер в приложение
 var app = builder.Build();

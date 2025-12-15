@@ -1,4 +1,4 @@
-namespace WebApi.DAL.Models;
+namespace Oms.DAL.Models;
 
 public class V1OrderDal
 {
@@ -7,6 +7,7 @@ public class V1OrderDal
     public string DeliveryAddress { get; set; }
     public long TotalPriceCents { get; set; }
     public string TotalPriceCurrency { get; set; }
+    public string Status { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }

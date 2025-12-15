@@ -1,6 +1,6 @@
-namespace WebApi.BLL.Models;
+namespace Oms.BLL.Models;
 
-public class QueryOrderItemsModel
+public class QueryOrdersModel
 {
     public long[] Ids { get; set; }
     public long[] CustomerIds { get; set; }

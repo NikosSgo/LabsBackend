@@ -1,19 +1,21 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models.Dto.V1.Requests;
 using Models.Dto.V1.Responses;
-using WebApi.BLL.Models;
-using WebApi.BLL.Services;
-using WebApi.Validators;
+using Oms.BLL.Models;
+using Oms.BLL.Services;
+using Oms.Validators;
 
-namespace WebApi.Controllers.V1;
+namespace Oms.Controllers.V1;
 
 [ApiController]
 [Route("api/v1/audit/")]
 public class AuditLogOrderController(
     AuditLogOrderService auditLogOrderService,
     ValidatorFactory validatorFactory,
-    ILogger<AuditLogOrderController> logger) : ControllerBase
+    ILogger<AuditLogOrderController> logger,
+    IMapper mapper) : ControllerBase
 {
     [HttpPost("log-order")]
     public async Task<ActionResult<V1AuditLogOrderResponse>> V1AuditLogOrder(
@@ -28,12 +30,12 @@ public class AuditLogOrderController(
                 return BadRequest(validationResult.ToDictionary());
             }
 
-            var mappedOrders = Map(request.Orders);
+            var mappedOrders = mapper.Map<AuditLogOrder[]>(request.Orders);
             var res = await auditLogOrderService.BatchInsert(mappedOrders, token);
 
             return Ok(new V1AuditLogOrderResponse
             {
-                Orders = Map(res)
+                Orders = mapper.Map<Models.Dto.Common.AuditLogOrder[]>(res)
             });
         }
         catch (ArgumentException ex)
@@ -49,25 +51,4 @@ public class AuditLogOrderController(
     }
 
 
-    private Models.Dto.Common.AuditLogOrder[] Map(AuditLogOrder[] orders)
-    {
-        return orders.Select(x => new Models.Dto.Common.AuditLogOrder
-        {
-            OrderId =x.OrderId,
-            CustomerId = x.CustomerId,
-            OrderItemId = x.OrderItemId,
-            OrderStatus = x.OrderStatus
-        }).ToArray();
-    }
-
-    private AuditLogOrder[] Map(Models.Dto.Common.AuditLogOrder[] orders)
-    {
-        return orders.Select(x => new AuditLogOrder
-        {
-            OrderId =x.OrderId,
-            CustomerId = x.CustomerId,
-            OrderItemId = x.OrderItemId,
-            OrderStatus = x.OrderStatus
-        }).ToArray();
-    }
 }

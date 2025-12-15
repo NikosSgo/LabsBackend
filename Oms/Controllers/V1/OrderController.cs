@@ -1,13 +1,44 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dto.V1.Requests;
 using Models.Dto.V1.Responses;
-using WebApi.BLL.Models;
-using WebApi.BLL.Services;
-using WebApi.Validators;
+using Oms.BLL.Models;
+using Oms.BLL.Services;
+using Oms.Validators;
 
 [Route("api/v1/order")]
-public class OrderController(OrderService orderService, ValidatorFactory validatorFactory): ControllerBase
+public class OrderController(
+    OrderService orderService,
+    ValidatorFactory validatorFactory,
+    IMapper mapper) : ControllerBase
 {
+    [HttpPost("batch-update-status")]
+    public async Task<ActionResult<V1UpdateOrdersStatusResponse>> V1BatchUpdateStatus([FromBody] V1UpdateOrdersStatusRequest request,
+        CancellationToken token)
+    {
+        var validationResult = await validatorFactory.GetValidator<V1UpdateOrdersStatusRequest>().ValidateAsync(request, token);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.ToDictionary());
+        }
+
+        var updateModel = mapper.Map<UpdateOrdersStatusModel>(request);
+
+        try
+        {
+            var res = await orderService.BatchUpdateStatus(new[] { updateModel }, token);
+
+            return Ok(new V1UpdateOrdersStatusResponse
+            {
+                Orders = mapper.Map<Models.Dto.Common.OrderUnit[]>(res)
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
     [HttpPost("batch-create")]
     public async Task<ActionResult<V1CreateOrderResponse>> V1BatchCreate([FromBody] V1CreateOrderRequest request, CancellationToken token)
     {
@@ -17,27 +48,14 @@ public class OrderController(OrderService orderService, ValidatorFactory validat
             return BadRequest(validationResult.ToDictionary());
         }
         
-        var res = await orderService.BatchInsert(request.Orders.Select(x => new OrderUnit
-        {
-            CustomerId = x.CustomerId,
-            DeliveryAddress = x.DeliveryAddress,
-            TotalPriceCents = x.TotalPriceCents,
-            TotalPriceCurrency = x.TotalPriceCurrency,
-            OrderItems = x.OrderItems.Select(p => new OrderItemUnit
-            {
-                ProductId = p.ProductId,
-                Quantity = p.Quantity,
-                ProductTitle = p.ProductTitle,
-                ProductUrl = p.ProductUrl,
-                PriceCents = p.PriceCents,
-                PriceCurrency = p.PriceCurrency,
-            }).ToArray()
-        }).ToArray(), token);
-
+        var res = await orderService.BatchInsert(
+            mapper.Map<OrderUnit[]>(request.Orders),
+            token
+            );
 
         return Ok(new V1CreateOrderResponse
         {
-            Orders = Map(res)
+            Orders = mapper.Map<Models.Dto.Common.OrderUnit[]>(res)
         });
     }
 
@@ -49,46 +67,15 @@ public class OrderController(OrderService orderService, ValidatorFactory validat
         {
             return BadRequest(validationResult.ToDictionary());
         }
-        
-        var res = await orderService.GetOrders(new QueryOrderItemsModel
-        {
-            Ids = request.Ids,
-            CustomerIds = request.CustomerIds,
-            Page = request.Page, 
-            PageSize = request.PageSize,
-            IncludeOrderItems = request.IncludeOrderItems
-        }, token);
+
+        var res = await orderService.GetOrders(
+            mapper.Map<QueryOrdersModel>(request),
+            token
+            );
         
         return Ok(new V1QueryOrdersResponse
         {
-            Orders = Map(res)
+            Orders = mapper.Map<Models.Dto.Common.OrderUnit[]>(res)
         });
-    }
-    
-    private Models.Dto.Common.OrderUnit[] Map(OrderUnit[] orders)
-    {
-        return orders.Select(x => new Models.Dto.Common.OrderUnit
-        {
-            Id = x.Id,
-            CustomerId = x.CustomerId,
-            DeliveryAddress = x.DeliveryAddress,
-            TotalPriceCents = x.TotalPriceCents,
-            TotalPriceCurrency = x.TotalPriceCurrency,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt,
-            OrderItems = x.OrderItems.Select(p => new Models.Dto.Common.OrderItemUnit
-            {
-                Id = p.Id,
-                OrderId = p.OrderId,
-                ProductId = p.ProductId,
-                Quantity = p.Quantity,
-                ProductTitle = p.ProductTitle,
-                ProductUrl = p.ProductUrl,
-                PriceCents = p.PriceCents,
-                PriceCurrency = p.PriceCurrency,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }).ToArray()
-        }).ToArray();
     }
 }

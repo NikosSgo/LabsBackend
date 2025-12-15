@@ -1,20 +1,126 @@
+using AutoMapper;
 using Messages;
 using Microsoft.Extensions.Options;
-using WebApi.BLL.Models;
-using WebApi.Config;
-using WebApi.DAL;
-using WebApi.DAL.Interfaces;
-using WebApi.DAL.Models;
+using Oms.BLL.Models;
+using Oms.Config;
+using Oms.DAL;
+using Oms.DAL.Interfaces;
+using Oms.DAL.Models;
 
-namespace WebApi.BLL.Services;
+namespace Oms.BLL.Services;
 
 public class OrderService(
     UnitOfWork unitOfWork,
     IOrderRepository orderRepository,
     IOrderItemRepository orderItemRepository,
     RabbitMqService _rabbitMqService,
-    IOptions<RabbitMqSettings> settings)
+    IOptions<RabbitMqSettings> settings,
+    IMapper mapper)
 {
+    public async Task<OrderUnit[]> BatchUpdateStatus(UpdateOrdersStatusModel[] updateOrdersModel, CancellationToken token)
+    {
+        await using var transaction = await unitOfWork.BeginTransactionAsync(token);
+        try
+        {
+            var allOrderIds = updateOrdersModel.SelectMany(m => m.OrderIds).Distinct().ToArray();
+            var updatedOrders = new List<V1OrderDal>();
+
+            foreach (var updateModel in updateOrdersModel)
+            {
+                var existing = await orderRepository.Query(new QueryOrdersDalModel
+                {
+                    Ids = updateModel.OrderIds
+                }, token);
+
+                if (existing.Length == 0)
+                {
+                    continue; // нет заказов — возвращаем 200 с пустым ответом
+                }
+
+                var targetStatus = Enum.Parse<OrderUnit.OrderStatus>(updateModel.NewStatus, true);
+                ValidateTransitions(existing, targetStatus);
+
+                var orders = await orderRepository.UpdateStatus(existing.Select(x => x.Id).ToArray(), updateModel.NewStatus, token);
+                updatedOrders.AddRange(orders);
+            }
+
+            await transaction.CommitAsync(token);
+
+            var orderItemLookup = await GetOrderItemsLookup(allOrderIds, token);
+
+            var statusMessages = updatedOrders
+                .SelectMany(order =>
+                {
+                    var items = orderItemLookup[order.Id].ToArray();
+
+                    return items.Select(item => new OmsOrderStatusChangedMessage
+                    {
+                        OrderId = order.Id,
+                        OrderItemId = item.Id,
+                        CustomerId = order.CustomerId,
+                        OrderStatus = order.Status,
+                        CreatedAt = order.CreatedAt,
+                        UpdatedAt = order.UpdatedAt
+                    });
+                })
+                .ToArray();
+
+            if (statusMessages.Length > 0)
+            {
+                await _rabbitMqService.Publish(statusMessages, token);
+            }
+
+            return Map(updatedOrders.ToArray(), orderItemLookup);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(token);
+            throw;
+        }
+    }
+
+    private async Task<ILookup<long, V1OrderItemDal>> GetOrderItemsLookup(long[] orderIds, CancellationToken token)
+    {
+        if (orderIds.Length == 0)
+        {
+            return Array.Empty<V1OrderItemDal>().ToLookup(x => x.OrderId);
+        }
+
+        var orderItems = await orderItemRepository.Query(new QueryOrderItemsDalModel
+        {
+            OrderIds = orderIds
+        }, token);
+
+        return orderItems.ToLookup(x => x.OrderId);
+    }
+
+    private static void ValidateTransitions(V1OrderDal[] existingOrders, OrderUnit.OrderStatus targetStatus)
+    {
+        foreach (var order in existingOrders)
+        {
+            var current = Enum.Parse<OrderUnit.OrderStatus>(order.Status, true);
+            if (current == targetStatus)
+            {
+                continue;
+            }
+
+            var allowed = current switch
+            {
+                OrderUnit.OrderStatus.Created => new[] { OrderUnit.OrderStatus.InAssembly, OrderUnit.OrderStatus.Rejected },
+                OrderUnit.OrderStatus.InAssembly => new[] { OrderUnit.OrderStatus.InDelivery, OrderUnit.OrderStatus.Rejected },
+                OrderUnit.OrderStatus.InDelivery => new[] { OrderUnit.OrderStatus.Completed, OrderUnit.OrderStatus.Rejected },
+                OrderUnit.OrderStatus.Rejected => new[] { OrderUnit.OrderStatus.InAssembly },
+                OrderUnit.OrderStatus.Completed => Array.Empty<OrderUnit.OrderStatus>(),
+                _ => Array.Empty<OrderUnit.OrderStatus>()
+            };
+
+            if (!allowed.Contains(targetStatus))
+            {
+                throw new InvalidOperationException($"Invalid status transition from {current} to {targetStatus} for order {order.Id}");
+            }
+        }
+    }
+
     /// <summary>
     /// Метод создания заказов
     /// </summary>
@@ -22,133 +128,59 @@ public class OrderService(
     {
         var now = DateTimeOffset.UtcNow;
         await using var transaction = await unitOfWork.BeginTransactionAsync(token);
-        var insertedOrders = Array.Empty<V1OrderDal>();
-        var insertedItems = Array.Empty<V1OrderItemDal>();
 
         try
         {
 
-            var orderDals = orderUnits.Select(o => new V1OrderDal
+            V1OrderDal[] orderDals = mapper.Map<V1OrderDal[]>(orderUnits);
+            Array.ForEach(orderDals, o =>
             {
-                CustomerId = o.CustomerId,
-                DeliveryAddress = o.DeliveryAddress,
-                TotalPriceCents = o.TotalPriceCents,
-                TotalPriceCurrency = o.TotalPriceCurrency,
-                CreatedAt = now,
-                UpdatedAt = now
+                o.Status = o.Status ?? "Created";
+                o.CreatedAt = now;
+                o.UpdatedAt = now;
+            });
+            var orders = await orderRepository.BulkInsert(orderDals, token);
+
+            V1OrderItemDal[] orderItemDals = orderUnits.SelectMany((o, index) =>
+            {
+                var items = mapper.Map<V1OrderItemDal[]>(o.OrderItems);
+                Array.ForEach(items, item =>
+                {
+                    item.OrderId = orders[index].Id;
+                    item.CreatedAt = now;
+                    item.UpdatedAt = now;
+                });
+                return items;
             }).ToArray();
 
-            insertedOrders = await orderRepository.BulkInsert(orderDals, token);
+            var orderItems = await orderItemRepository.BulkInsert(orderItemDals, token);
 
-            // Создаем словарь для сопоставления вставленных заказов с исходными по их свойствам
-            // Используем свойства без CreatedAt, так как время может немного отличаться
-            // Используем список для каждого ключа, чтобы обработать возможные дубликаты
-            var orderMapping = new Dictionary<(long CustomerId, string DeliveryAddress, long TotalPriceCents, string TotalPriceCurrency), List<V1OrderDal>>();
-            foreach (var insertedOrder in insertedOrders)
-            {
-                var key = (insertedOrder.CustomerId, insertedOrder.DeliveryAddress, 
-                          insertedOrder.TotalPriceCents, insertedOrder.TotalPriceCurrency);
-                if (!orderMapping.TryGetValue(key, out var orders))
-                {
-                    orders = new List<V1OrderDal>();
-                    orderMapping[key] = orders;
-                }
-                orders.Add(insertedOrder);
-            }
+            ILookup<long, V1OrderItemDal> orderItemLookup = orderItems.ToLookup(x => x.OrderId);
 
-            // Отслеживаем, какие заказы уже использованы для обработки дубликатов
-            var usedOrders = new Dictionary<(long CustomerId, string DeliveryAddress, long TotalPriceCents, string TotalPriceCurrency), int>();
-            
-            var allOrderItems = orderUnits.SelectMany(order =>
+            OmsOrderCreatedMessage[] messages = orders.Select(o =>
             {
-                // Находим соответствующий вставленный заказ по свойствам (без CreatedAt)
-                var key = (order.CustomerId, order.DeliveryAddress, 
-                          order.TotalPriceCents, order.TotalPriceCurrency);
-                if (!orderMapping.TryGetValue(key, out var matchingOrders) || matchingOrders.Count == 0)
-                {
-                    throw new InvalidOperationException($"Не удалось найти вставленный заказ для сопоставления OrderItems");
-                }
-                
-                // Используем индекс для выбора нужного заказа в случае дубликатов
-                if (!usedOrders.TryGetValue(key, out var usedIndex))
-                {
-                    usedIndex = 0;
-                }
-                
-                if (usedIndex >= matchingOrders.Count)
-                {
-                    throw new InvalidOperationException($"Недостаточно вставленных заказов для сопоставления (дубликаты)");
-                }
-                
-                var insertedOrder = matchingOrders[usedIndex];
-                usedOrders[key] = usedIndex + 1;
-                
-                return order.OrderItems?.Select(item => new V1OrderItemDal
-                {
-                    OrderId = insertedOrder.Id,
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    ProductTitle = item.ProductTitle,
-                    ProductUrl = item.ProductUrl,
-                    PriceCents = item.PriceCents,
-                    PriceCurrency = item.PriceCurrency,
-                    CreatedAt = now,
-                    UpdatedAt = now
-                }) ?? [];
+                var message = mapper.Map<OmsOrderCreatedMessage>(o);
+                message.OrderItems = orderItemLookup[o.Id]
+                    .Select(i => mapper.Map<OmsOrderCreatedMessage.OrderItemUnit>(i))
+                    .ToArray();
+                return message;
             }).ToArray();
 
-            if (allOrderItems.Length > 0)
-            {
-                insertedItems = await orderItemRepository.BulkInsert(allOrderItems, token);
-            }
-
+            await _rabbitMqService.Publish(messages, token);
             await transaction.CommitAsync(token);
+            return Map(orders, orderItemLookup);
         }
         catch
         {
             await transaction.RollbackAsync(token);
             throw;
         }
-
-        var orderItemLookup = insertedItems.ToLookup(x => x.OrderId);
-        var messages = insertedOrders.Select(order => new OmsOrderCreatedMessage
-        {
-            Id = order.Id,
-            CustomerId = order.CustomerId,
-            DeliveryAddress = order.DeliveryAddress,
-            TotalPriceCents = order.TotalPriceCents,
-            TotalPriceCurrency = order.TotalPriceCurrency,
-            CreatedAt = order.CreatedAt,
-            UpdatedAt = order.UpdatedAt,
-            OrderItems = orderItemLookup[order.Id].Select(item => new OmsOrderCreatedMessage.OrderItemUnit
-            {
-                Id = item.Id,
-                OrderId = item.OrderId,
-                ProductId = item.ProductId,
-                Quantity = item.Quantity,
-                ProductTitle = item.ProductTitle,
-                ProductUrl = item.ProductUrl,
-                PriceCents = item.PriceCents,
-                PriceCurrency = item.PriceCurrency,
-                CreatedAt = item.CreatedAt,
-                UpdatedAt = item.UpdatedAt
-            }).ToArray()
-        }).ToArray();
-
-        if (messages.Length > 0)
-        {
-            await _rabbitMqService.Publish(messages, settings.Value.OrderCreatedQueue, token);
-        }
-
-        // Создаем lookup для OrderItems чтобы включить их в ответ
-        var orderItemLookupForResponse = insertedItems.ToLookup(x => x.OrderId);
-        return Map(insertedOrders, orderItemLookupForResponse);
     }
-    
+
     /// <summary>
     /// Метод получения заказов
     /// </summary>
-    public async Task<OrderUnit[]> GetOrders(QueryOrderItemsModel model, CancellationToken token)
+    public async Task<OrderUnit[]> GetOrders(QueryOrdersModel model, CancellationToken token)
     {
         var orders = await orderRepository.Query(new QueryOrdersDalModel
         {
@@ -176,31 +208,23 @@ public class OrderService(
 
         return Map(orders, orderItemLookup);
     }
-    
+
     private OrderUnit[] Map(V1OrderDal[] orders, ILookup<long, V1OrderItemDal> orderItemLookup = null)
     {
-        return orders.Select(x => new OrderUnit
+        var mappedOrders = mapper.Map<OrderUnit[]>(orders);
+
+        foreach (var order in mappedOrders)
         {
-            Id = x.Id,
-            CustomerId = x.CustomerId,
-            DeliveryAddress = x.DeliveryAddress,
-            TotalPriceCents = x.TotalPriceCents,
-            TotalPriceCurrency = x.TotalPriceCurrency,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt,
-            OrderItems = orderItemLookup?[x.Id].Select(o => new OrderItemUnit
+            if (orderItemLookup is null)
             {
-                Id = o.Id,
-                OrderId = o.OrderId,
-                ProductId = o.ProductId,
-                Quantity = o.Quantity,
-                ProductTitle = o.ProductTitle,
-                ProductUrl = o.ProductUrl,
-                PriceCents = o.PriceCents,
-                PriceCurrency = o.PriceCurrency,
-                CreatedAt = o.CreatedAt,
-                UpdatedAt = o.UpdatedAt
-            }).ToArray() ?? []
-        }).ToArray();
+                order.OrderItems = Array.Empty<OrderItemUnit>();
+                continue;
+            }
+
+            var items = orderItemLookup[order.Id].ToArray();
+            order.OrderItems = mapper.Map<OrderItemUnit[]>(items);
+        }
+
+        return mappedOrders;
     }
 }

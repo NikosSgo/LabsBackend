@@ -1,16 +1,15 @@
 using System.Text;
 using Dapper;
-using WebApi.DAL.Interfaces;
-using WebApi.DAL.Models;
+using Oms.DAL.Interfaces;
+using Oms.DAL.Models;
 
-namespace WebApi.DAL.Repositories;
+namespace Oms.DAL.Repositories;
 
 public class OrderRepository(UnitOfWork unitOfWork) : IOrderRepository
 {
     public async Task<V1OrderDal[]> BulkInsert(V1OrderDal[] model, CancellationToken token)
     {
-        // пишем sql
-        // после from можно увидеть unnest(@Orders) - это и есть механизм композитных типов
+
         var sql = @"
             insert into orders 
             (
@@ -18,6 +17,7 @@ public class OrderRepository(UnitOfWork unitOfWork) : IOrderRepository
                 delivery_address,
                 total_price_cents,
                 total_price_currency,
+                status,
                 created_at,
                 updated_at
              )
@@ -26,6 +26,7 @@ public class OrderRepository(UnitOfWork unitOfWork) : IOrderRepository
                 delivery_address,
                 total_price_cents,
                 total_price_currency,
+                status,
                 created_at,
                 updated_at
             from unnest(@Orders)
@@ -35,6 +36,7 @@ public class OrderRepository(UnitOfWork unitOfWork) : IOrderRepository
                 delivery_address,
                 total_price_cents,
                 total_price_currency,
+                status,
                 created_at,
                 updated_at;
         ";
@@ -57,6 +59,7 @@ public class OrderRepository(UnitOfWork unitOfWork) : IOrderRepository
                 delivery_address,
                 total_price_cents,
                 total_price_currency,
+                status,
                 created_at,
                 updated_at
             from orders
@@ -102,6 +105,32 @@ public class OrderRepository(UnitOfWork unitOfWork) : IOrderRepository
         var res = await conn.QueryAsync<V1OrderDal>(new CommandDefinition(
             sql.ToString(), param, cancellationToken: token));
         
+        return res.ToArray();
+    }
+
+    public async Task<V1OrderDal[]> UpdateStatus(long[] orderIds, string newStatus, CancellationToken token)
+    {
+        var sql = @"
+            update orders
+            set 
+                status = @NewStatus::v1_order_status,
+                updated_at = @UpdatedAt
+            where id = ANY(@OrderIds)
+            returning 
+                id,
+                customer_id,
+                delivery_address,
+                total_price_cents,
+                total_price_currency,
+                status,
+                created_at,
+                updated_at;
+        ";
+
+        var conn = await unitOfWork.GetConnection(token);
+        var res = await conn.QueryAsync<V1OrderDal>(new CommandDefinition(
+            sql, new { OrderIds = orderIds, NewStatus = newStatus, UpdatedAt = DateTimeOffset.UtcNow }, cancellationToken: token));
+
         return res.ToArray();
     }
 }

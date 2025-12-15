@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "2piRYOENQ+s=",
+  "dgSpecHash": "IV0Z1OTj+3E=",
   "success": true,
   "projectFilePath": "/home/niko/Projects/Education/Backend/LabsBackend/Consumer/Consumer.csproj",
   "expectedPackageFiles": [
@@ -10,7 +10,9 @@
     "/home/niko/.nuget/packages/rabbitmq.client/7.2.0/rabbitmq.client.7.2.0.nupkg.sha512",
     "/home/niko/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
     "/home/niko/.nuget/packages/system.threading.ratelimiting/8.0.0/system.threading.ratelimiting.8.0.0.nupkg.sha512",
-    "/home/niko/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.9/microsoft.aspnetcore.app.ref.9.0.9.nupkg.sha512"
+    "/home/niko/.nuget/packages/microsoft.netcore.app.ref/9.0.11/microsoft.netcore.app.ref.9.0.11.nupkg.sha512",
+    "/home/niko/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.11/microsoft.aspnetcore.app.ref.9.0.11.nupkg.sha512",
+    "/home/niko/.nuget/packages/microsoft.netcore.app.host.linux-x64/9.0.11/microsoft.netcore.app.host.linux-x64.9.0.11.nupkg.sha512"
   ],
   "logs": []
 }

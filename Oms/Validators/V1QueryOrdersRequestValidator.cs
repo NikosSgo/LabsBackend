@@ -1,4 +1,4 @@
-namespace WebApi.Validators;
+namespace Oms.Validators;
 
 using FluentValidation;
 using Models.Dto.V1.Requests;

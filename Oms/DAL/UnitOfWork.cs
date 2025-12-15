@@ -1,10 +1,10 @@
 using System.Data;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using WebApi.Config;
-using WebApi.DAL.Models;
+using Oms.Config;
+using Oms.DAL.Models;
 
-namespace WebApi.DAL;
+namespace Oms.DAL;
 
 public class UnitOfWork(IOptions<DbSettings> dbSettings): IDisposable
 {

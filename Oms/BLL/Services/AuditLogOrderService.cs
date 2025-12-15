@@ -1,13 +1,15 @@
-using WebApi.BLL.Models;
-using WebApi.DAL;
-using WebApi.DAL.Interfaces;
-using WebApi.DAL.Models;
+using AutoMapper;
+using Oms.BLL.Models;
+using Oms.DAL;
+using Oms.DAL.Interfaces;
+using Oms.DAL.Models;
 
-namespace WebApi.BLL.Services;
+namespace Oms.BLL.Services;
 
 public class AuditLogOrderService(
     UnitOfWork unitOfWork,
-    IAuditLogOrderRepository auditLogOrderRepository
+    IAuditLogOrderRepository auditLogOrderRepository,
+    IMapper mapper
 )
 {
 
@@ -19,23 +21,21 @@ public class AuditLogOrderService(
 
         try
         {
-
-            var orderDals = orderUnits.Select(o => new V1AuditLogOrderDal
+            // гарантируем валидные временные метки, чтобы не уехать в Infinity в UI
+            Array.ForEach(orderUnits, o =>
             {
-                OrderId =  o.OrderId,
-                OrderItemId =  o.OrderItemId,
-                OrderStatus =   o.OrderStatus,
-                CustomerId = o.CustomerId,
-                CreatedAt = now,
-                UpdatedAt = now
-            }).ToArray();
+                o.CreatedAt = now;
+                o.UpdatedAt = now;
+            });
 
-            insertedLogOrders = await auditLogOrderRepository.BulkInsert(orderDals, token);
-
+            insertedLogOrders = await auditLogOrderRepository.BulkInsert(
+                mapper.Map<V1AuditLogOrderDal[]>(orderUnits),
+                token
+                );
 
             await transaction.CommitAsync(token);
 
-            return Map(insertedLogOrders);
+            return mapper.Map<AuditLogOrder[]>(insertedLogOrders);
         }
         catch
         {
@@ -44,16 +44,4 @@ public class AuditLogOrderService(
         }
     }
 
-    private AuditLogOrder[] Map(V1AuditLogOrderDal[] auditLogOrderDals)
-    {
-        return auditLogOrderDals.Select(x => new AuditLogOrder
-        {
-            OrderId =  x.OrderId,
-            OrderItemId =  x.OrderItemId,
-            OrderStatus =  x.OrderStatus,
-            CustomerId = x.CustomerId,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt
-        }).ToArray();
-    }
 }

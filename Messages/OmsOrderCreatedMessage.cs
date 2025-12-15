@@ -1,7 +1,8 @@
 namespace Messages;
 
-public class OmsOrderCreatedMessage
+public class OmsOrderCreatedMessage : BaseMessage
 {
+    public override string RoutingKey => "order.created";
     public long Id { get; set; }
     public long CustomerId { get; set; }
     public string DeliveryAddress { get; set; }

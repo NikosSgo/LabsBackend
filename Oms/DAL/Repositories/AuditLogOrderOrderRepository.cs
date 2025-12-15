@@ -1,8 +1,8 @@
 using Dapper;
-using WebApi.DAL.Interfaces;
-using WebApi.DAL.Models;
+using Oms.DAL.Interfaces;
+using Oms.DAL.Models;
 
-namespace WebApi.DAL.Repositories;
+namespace Oms.DAL.Repositories;
 
 public class AuditLogOrderOrderRepository (
     UnitOfWork unitOfWork

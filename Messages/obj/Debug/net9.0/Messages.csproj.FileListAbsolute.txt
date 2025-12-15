@@ -10,3 +10,15 @@
 /home/niko/Projects/Education/Backend/LabProject/Messages/obj/Debug/net9.0/refint/Messages.dll
 /home/niko/Projects/Education/Backend/LabProject/Messages/obj/Debug/net9.0/Messages.pdb
 /home/niko/Projects/Education/Backend/LabProject/Messages/obj/Debug/net9.0/ref/Messages.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/bin/Debug/net9.0/Messages.deps.json
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/bin/Debug/net9.0/Messages.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/bin/Debug/net9.0/Messages.pdb
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.GeneratedMSBuildEditorConfig.editorconfig
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.AssemblyInfoInputs.cache
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.AssemblyInfo.cs
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.csproj.CoreCompileInputs.cache
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.sourcelink.json
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/refint/Messages.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/Messages.pdb
+/home/niko/Projects/Education/Backend/LabsBackend/Messages/obj/Debug/net9.0/ref/Messages.dll

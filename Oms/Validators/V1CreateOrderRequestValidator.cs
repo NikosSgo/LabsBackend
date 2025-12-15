@@ -1,7 +1,7 @@
 using FluentValidation;
 using Models.Dto.V1.Requests;
 
-namespace WebApi.Validators;
+namespace Oms.Validators;
 
 public class V1CreateOrderRequestValidator: AbstractValidator<V1CreateOrderRequest>
 {

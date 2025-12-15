@@ -1,29 +1,29 @@
 using System.Text;
 using Common;
 using Consumer.Config;
+using Consumer.Consumers.Base;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace Consumer.Consumers.Base;
+namespace Consumer.Base;
 
-public abstract class BaseBatchMessageConsumer<T>(RabbitMqSettings rabbitMqSettings): IHostedService
+public abstract class BaseBatchMessageConsumer<T>(RabbitMqSettings rabbitMqSettings, Func<RabbitMqSettings, RabbitMqSettings.TopicSettingsUnit> rabbitFunc): IHostedService
     where T : class
 {
     private IConnection _connection;
     private IChannel _channel;
-    private const int MaxRetryAttempts = 3;
-    private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(2);
 
     private readonly ConnectionFactory _factory = new()
     {
         HostName = rabbitMqSettings.HostName,
         Port = rabbitMqSettings.Port,
         UserName = rabbitMqSettings.UserName,
-        Password = rabbitMqSettings.Password
+        Password =  rabbitMqSettings.Password
     };
     private List<MessageInfo> _messageBuffer;
     private Timer _batchTimer;
     private SemaphoreSlim _processingSemaphore;
+    private readonly RabbitMqSettings.TopicSettingsUnit _topicSettings = rabbitFunc(rabbitMqSettings);
 
     protected abstract Task ProcessMessages(T[] messages);
 
@@ -36,24 +36,49 @@ public abstract class BaseBatchMessageConsumer<T>(RabbitMqSettings rabbitMqSetti
         _processingSemaphore = new SemaphoreSlim(1, 1);
 
         // Настройка prefetch для батчевой обработки
-        await _channel.BasicQosAsync(0, (ushort)(rabbitMqSettings.BatchSize * 2), false, token);
+        await _channel.BasicQosAsync(0, (ushort)(_topicSettings.BatchSize * 2), false, token);
 
-        var batchTimeout = TimeSpan.FromSeconds(rabbitMqSettings.BatchTimeoutSeconds);
+        var batchTimeout = TimeSpan.FromSeconds(_topicSettings.BatchTimeoutSeconds);
         // Таймер для принудительной обработки по времени
         _batchTimer = new Timer(ProcessBatchByTimeout, null, batchTimeout, batchTimeout);
 
+        await _channel.ExchangeDeclareAsync(
+            exchange: _topicSettings.DeadLetter.Dlx,
+            type: ExchangeType.Direct,
+            durable: true,
+            cancellationToken: token);
+
         await _channel.QueueDeclareAsync(
-            queue: rabbitMqSettings.OrderCreatedQueue,
+            queue: _topicSettings.DeadLetter.Dlq,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
+            cancellationToken: token);
+
+        await _channel.QueueBindAsync(
+            queue: _topicSettings.DeadLetter.Dlq,
+            exchange: _topicSettings.DeadLetter.Dlx,
+            routingKey: _topicSettings.DeadLetter.RoutingKey,
+            cancellationToken: token);
+
+        var queueArgs = new Dictionary<string, object>
+        {
+            {"x-dead-letter-exchange", _topicSettings.DeadLetter.Dlx},
+            {"x-dead-letter-routing-key", _topicSettings.DeadLetter.RoutingKey}
+        };
+
+        await _channel.QueueDeclareAsync(
+            queue: _topicSettings.Queue,
             durable: false,
             exclusive: false,
             autoDelete: false,
-            arguments: null,
+            arguments: queueArgs,
             cancellationToken: token);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += OnMessageReceived;
 
-        await _channel.BasicConsumeAsync(queue: rabbitMqSettings.OrderCreatedQueue, autoAck: false, consumer: consumer, cancellationToken: token);
+        await _channel.BasicConsumeAsync(queue: _topicSettings.Queue, autoAck: false, consumer: consumer, cancellationToken: token);
     }
 
     private async Task OnMessageReceived(object sender, BasicDeliverEventArgs ea)
@@ -71,7 +96,7 @@ public abstract class BaseBatchMessageConsumer<T>(RabbitMqSettings rabbitMqSetti
             });
 
             // Если достигли лимита батча - обрабатываем
-            if (_messageBuffer.Count >= rabbitMqSettings.BatchSize)
+            if (_messageBuffer.Count >= _topicSettings.BatchSize)
             {
                 await ProcessBatch();
             }
@@ -106,32 +131,26 @@ public abstract class BaseBatchMessageConsumer<T>(RabbitMqSettings rabbitMqSetti
         var currentBatch = _messageBuffer.ToList();
         _messageBuffer.Clear();
 
-        var lastDeliveryTag = currentBatch.Max(x => x.DeliveryTag);
-        var messages = currentBatch.Select(x => x.Message.FromJson<T>()).ToArray();
-
-        for (var attempt = 1; attempt <= MaxRetryAttempts; attempt++)
+        try
         {
-            try
-            {
-                await ProcessMessages(messages);
-                await _channel.BasicAckAsync(lastDeliveryTag, multiple: true);
-                Console.WriteLine($"Successfully processed batch of {currentBatch.Count} messages (attempt {attempt})");
-                return;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to process batch attempt {attempt}/{MaxRetryAttempts}: {ex.Message}");
+            var messages = currentBatch.Select(x => x.Message.FromJson<T>()).ToArray();
 
-                if (attempt == MaxRetryAttempts)
-                {
-                    // NACK всех сообщений в батче для повторной обработки
-                    await _channel.BasicNackAsync(lastDeliveryTag, multiple: true, requeue: true);
-                }
-                else
-                {
-                    await Task.Delay(RetryDelay);
-                }
-            }
+            // Ваша логика обработки батча
+            await ProcessMessages(messages);
+
+            // ACK всех сообщений в батче (multiple = true для последнего)
+            var lastDeliveryTag = currentBatch.Max(x => x.DeliveryTag);
+            await _channel.BasicAckAsync(lastDeliveryTag, multiple: true);
+
+            Console.WriteLine($"Successfully processed batch of {currentBatch.Count} messages");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to process batch: {ex.Message}");
+
+            // NACK всех сообщений в батче для повторной обработки
+            var lastDeliveryTag = currentBatch.Max(x => x.DeliveryTag);
+            await _channel.BasicNackAsync(lastDeliveryTag, multiple: true, requeue: false);
         }
     }
 

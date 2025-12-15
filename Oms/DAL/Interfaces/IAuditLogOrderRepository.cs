@@ -1,6 +1,6 @@
-using WebApi.DAL.Models;
+using Oms.DAL.Models;
 
-namespace WebApi.DAL.Interfaces;
+namespace Oms.DAL.Interfaces;
 
 public interface IAuditLogOrderRepository
 {

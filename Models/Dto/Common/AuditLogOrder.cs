@@ -10,5 +10,3 @@ public class AuditLogOrder
 
     public string OrderStatus { get; set; }
 }
-
-public enum OrderStatus { Created, Pending, Rejected }

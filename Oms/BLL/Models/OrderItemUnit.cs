@@ -1,4 +1,4 @@
-namespace WebApi.BLL.Models;
+namespace Oms.BLL.Models;
 
 public class OrderItemUnit
 {

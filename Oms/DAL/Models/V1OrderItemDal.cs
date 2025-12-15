@@ -1,4 +1,4 @@
-namespace WebApi.DAL.Models;
+namespace Oms.DAL.Models;
 
 public class V1OrderItemDal
 {

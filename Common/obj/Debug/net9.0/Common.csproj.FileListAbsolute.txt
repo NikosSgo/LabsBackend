@@ -11,3 +11,16 @@
 /home/niko/Projects/Education/Backend/LabProject/Common/obj/Debug/net9.0/refint/Common.dll
 /home/niko/Projects/Education/Backend/LabProject/Common/obj/Debug/net9.0/Common.pdb
 /home/niko/Projects/Education/Backend/LabProject/Common/obj/Debug/net9.0/ref/Common.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Common/bin/Debug/net9.0/Common.deps.json
+/home/niko/Projects/Education/Backend/LabsBackend/Common/bin/Debug/net9.0/Common.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Common/bin/Debug/net9.0/Common.pdb
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.csproj.AssemblyReference.cache
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.GeneratedMSBuildEditorConfig.editorconfig
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.AssemblyInfoInputs.cache
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.AssemblyInfo.cs
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.csproj.CoreCompileInputs.cache
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.sourcelink.json
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/refint/Common.dll
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/Common.pdb
+/home/niko/Projects/Education/Backend/LabsBackend/Common/obj/Debug/net9.0/ref/Common.dll

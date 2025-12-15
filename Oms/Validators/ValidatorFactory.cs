@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace WebApi.Validators;
+namespace Oms.Validators;
 
 public class ValidatorFactory(IServiceProvider serviceProvider)
 {

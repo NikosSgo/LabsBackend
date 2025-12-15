@@ -1,14 +1,18 @@
 using System.Text;
 using System.Threading;
 using Common;
+using Messages;
 using Microsoft.Extensions.Options;
+using Oms.Config;
 using RabbitMQ.Client;
-using WebApi.Config;
 
-namespace WebApi;
+
+namespace Oms.BLL.Services;
 
 public class RabbitMqService(IOptions<RabbitMqSettings> settings) : IAsyncDisposable
 {
+    private readonly RabbitMqSettings _settings = settings.Value;
+
     private readonly ConnectionFactory _factory = new()
     {
         HostName = settings.Value.HostName,
@@ -21,28 +25,21 @@ public class RabbitMqService(IOptions<RabbitMqSettings> settings) : IAsyncDispos
     private IChannel _channel;
     private readonly SemaphoreSlim _channelLock = new(1, 1);
 
-    public async Task Publish<T>(IEnumerable<T> enumerable, string queue, CancellationToken token)
+    public async Task Publish<T>(IEnumerable<T> enumerable, CancellationToken token)
+        where T : BaseMessage
     {
         await _channelLock.WaitAsync(token);
         try
         {
             var channel = await GetOrCreateChannelAsync(token);
 
-            await channel.QueueDeclareAsync(
-                queue: queue,
-                durable: false,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null,
-                cancellationToken: token);
-
             foreach (var message in enumerable)
             {
                 var messageStr = message.ToJson();
                 var body = Encoding.UTF8.GetBytes(messageStr);
                 await channel.BasicPublishAsync(
-                    exchange: string.Empty,
-                    routingKey: queue,
+                    exchange: _settings.Exchange,
+                    routingKey: message.RoutingKey,
                     body: body,
                     cancellationToken: token);
             }
@@ -66,6 +63,33 @@ public class RabbitMqService(IOptions<RabbitMqSettings> settings) : IAsyncDispos
         }
 
         _channel = await _connection.CreateChannelAsync(cancellationToken: token);
+        await _channel.ExchangeDeclareAsync(_settings.Exchange, ExchangeType.Topic, cancellationToken: token);
+
+        if (_settings.ExchangeMappings is { Length: > 0 })
+        {
+            foreach (var mapping in settings.Value.ExchangeMappings)
+            {
+                var args = mapping.DeadLetter is null ? null : new Dictionary<string, object>
+                {
+                    { "x-dead-letter-exchange", mapping.DeadLetter.Dlx },
+                    { "x-dead-letter-routing-key", mapping.DeadLetter.RoutingKey }
+                };
+
+                await _channel.QueueDeclareAsync(
+                    queue: mapping.Queue,
+                    durable: false,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: args,
+                    cancellationToken: token);
+
+                await _channel.QueueBindAsync(
+                    queue: mapping.Queue,
+                    exchange: settings.Value.Exchange,
+                    routingKey: mapping.RoutingKeyPattern,
+                    cancellationToken: token);
+            }
+        }
         return _channel;
     }
 
